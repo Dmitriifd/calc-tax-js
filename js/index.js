@@ -26,6 +26,18 @@ function debounce(fn, delay) {
 	}
 }
 
+// Reset btns
+
+const resultBlock = document.querySelectorAll('.result__tax')
+const btnsReset = document.querySelectorAll('.calc__btn-reset')
+btnsReset.forEach((btn) => {
+	btn.addEventListener('click', () => {
+		resultBlock.forEach((block) => {
+			block.textContent = 0
+		})
+	})
+})
+
 {
 	const navigationLinks = document.querySelectorAll('.navigation__link')
 	const calcElems = document.querySelectorAll('.calc')
@@ -70,7 +82,7 @@ function debounce(fn, delay) {
 				calcLabelExpenses.style.display = ''
 				resultTaxTotal.textContent = formatCurrency(profit * 0.2)
 			}
-		}, 500)
+		}, 300)
 	)
 }
 
@@ -122,7 +134,7 @@ function debounce(fn, delay) {
 			resultTaxCompensation.textContent = formatCurrency(benifit - finalBenifit)
 			resultTaxRestCompensation.textContent = formatCurrency(finalBenifit)
 			resultTaxResult.textContent = formatCurrency(finalTax)
-		}, 500)
+		}, 300)
 	)
 }
 
@@ -178,7 +190,7 @@ function debounce(fn, delay) {
 			resultTaxNdflExpenses.textContent = formatCurrency(ndflExpensesTotal)
 			resultTaxNdflIncome.textContent = formatCurrency(ndflIncomeTotal)
 			resultTaxProfit.textContent = formatCurrency(taxProfit)
-		}, 500)
+		}, 300)
 	)
 }
 
@@ -251,7 +263,7 @@ function debounce(fn, delay) {
 
 			resultTaxTotal.textContent = formatCurrency(tax < 0 ? 0 : tax)
 			resultTaxProperty.textContent = formatCurrency(taxProperty)
-		}, 500)
+		}, 300)
 	)
 }
 
@@ -279,6 +291,6 @@ function debounce(fn, delay) {
 			resultTaxNdfl.textContent = formatCurrency(ndfl)
 			resultTaxPossible.textContent = formatCurrency(possibleDeduction)
 			resultTaxDeduction.textContent = formatCurrency(deduction)
-		}, 500)
+		}, 300)
 	)
 }

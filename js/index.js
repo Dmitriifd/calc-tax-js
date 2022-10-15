@@ -86,3 +86,54 @@ formSelfEmployment.addEventListener('input', () => {
 	resultTaxRestCompensation.textContent = formatCurrency(finalBenifit)
 	resultTaxResult.textContent = formatCurrency(finalTax)
 })
+
+// ОСНО
+
+const osno = document.querySelector('.osno')
+const formOsno = osno.querySelector('.calc__form')
+
+const ndflExpenses = osno.querySelector('.result__block_ndfl-expenses')
+const ndflIncome = osno.querySelector('.result__block_ndfl-income')
+const profit = osno.querySelector('.result__block_profit')
+
+const resultTaxNds = osno.querySelector('.result__tax_nds')
+const resultTaxProperty = osno.querySelector('.result__tax_property')
+const resultTaxNdflExpenses = osno.querySelector('.result__tax__ndfl-expenses')
+const resultTaxNdflIncome = osno.querySelector('.result__tax_ndfl-income')
+const resultTaxProfit = osno.querySelector('.result__tax_profit')
+
+function checkFormBusiness() {
+	if (formOsno.formBusiness.value === 'ip') {
+		ndflExpenses.style.display = ''
+		ndflIncome.style.display = ''
+		profit.style.display = 'none'
+	}
+	if (formOsno.formBusiness.value === 'ooo') {
+		ndflExpenses.style.display = 'none'
+		ndflIncome.style.display = 'none'
+		profit.style.display = ''
+	}
+}
+
+checkFormBusiness()
+
+formOsno.addEventListener('input', () => {
+	checkFormBusiness()
+
+	const income = formOsno.income.value
+	const expenses = formOsno.expenses.value
+	const property = formOsno.property.value
+
+	const nds = income * 0.2
+	const taxProperty = property * 0.02
+	const profit = income - expenses
+	const ndflExpensesTotal = profit * 0.13
+	const ndflIncomeTotal = (income - nds) * 0.13
+	const taxProfit = profit * 0.2
+
+	resultTaxNds.textContent = formatCurrency(nds)
+	resultTaxProperty.textContent = formatCurrency(taxProperty)
+	resultTaxNdflExpenses.textContent = formatCurrency(ndflExpensesTotal)
+	resultTaxNdflIncome.textContent = formatCurrency(ndflIncomeTotal)
+	resultTaxProfit.textContent = formatCurrency(taxProfit)
+})

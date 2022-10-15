@@ -1,9 +1,29 @@
+// utils
+
 function formatCurrency(n) {
 	return new Intl.NumberFormat('ru-Ru', {
 		style: 'currency',
 		currency: 'RUB',
 		maximumFractionDigits: 2,
 	}).format(n)
+}
+
+function debounce(fn, delay) {
+	let lastCall = 0
+	let lastCallTimer
+
+	return (...args) => {
+		const previousCall = lastCall
+		lastCall = Date.now()
+
+		if (previousCall && lastCall - previousCall <= delay) {
+			clearTimeout(lastCallTimer)
+		}
+
+		lastCallTimer = setTimeout(() => {
+			fn(...args)
+		}, delay)
+	}
 }
 
 {
@@ -34,21 +54,24 @@ function formatCurrency(n) {
 
 	// АУСН
 
-	formAusn.addEventListener('input', () => {
-		const income = +formAusn.income.value
+	formAusn.addEventListener(
+		'input',
+		debounce(() => {
+			const income = +formAusn.income.value
 
-		if (formAusn.type.value === 'income') {
-			calcLabelExpenses.style.display = 'none'
-			resultTaxTotal.textContent = formatCurrency(income * 0.08)
-			formAusn.expenses.value = ''
-		}
-		if (formAusn.type.value === 'expenses') {
-			const expenses = +formAusn.expenses.value
-			const profit = income < expenses ? 0 : income - expenses
-			calcLabelExpenses.style.display = ''
-			resultTaxTotal.textContent = formatCurrency(profit * 0.2)
-		}
-	})
+			if (formAusn.type.value === 'income') {
+				calcLabelExpenses.style.display = 'none'
+				resultTaxTotal.textContent = formatCurrency(income * 0.08)
+				formAusn.expenses.value = ''
+			}
+			if (formAusn.type.value === 'expenses') {
+				const expenses = +formAusn.expenses.value
+				const profit = income < expenses ? 0 : income - expenses
+				calcLabelExpenses.style.display = ''
+				resultTaxTotal.textContent = formatCurrency(profit * 0.2)
+			}
+		}, 500)
+	)
 }
 
 {
@@ -76,27 +99,31 @@ function formatCurrency(n) {
 
 	calcCompensation.style.display = 'none'
 
-	formSelfEmployment.addEventListener('input', () => {
-		const individual = +formSelfEmployment.individual.value
-		const entity = +formSelfEmployment.entity.value
-		const resultIndividual = individual * 0.04
-		const resultEntity = entity * 0.06
+	formSelfEmployment.addEventListener(
+		'input',
+		debounce(() => {
+			const individual = +formSelfEmployment.individual.value
+			const entity = +formSelfEmployment.entity.value
+			const resultIndividual = individual * 0.04
+			const resultEntity = entity * 0.06
 
-		checkCompensation()
+			checkCompensation()
 
-		const tax = resultIndividual + resultEntity
+			const tax = resultIndividual + resultEntity
 
-		formSelfEmployment.compensation.value = +formSelfEmployment.compensation.value > 10_000 ? 10_000 : formSelfEmployment.compensation.value
-		const benifit = +formSelfEmployment.compensation.value
-		const resBenifit = individual * 0.01 + entity * 0.02
-		const finalBenifit = benifit - resBenifit > 0 ? benifit - resBenifit : 0
-		const finalTax = tax - (benifit - finalBenifit)
+			formSelfEmployment.compensation.value =
+				+formSelfEmployment.compensation.value > 10_000 ? 10_000 : formSelfEmployment.compensation.value
+			const benifit = +formSelfEmployment.compensation.value
+			const resBenifit = individual * 0.01 + entity * 0.02
+			const finalBenifit = benifit - resBenifit > 0 ? benifit - resBenifit : 0
+			const finalTax = tax - (benifit - finalBenifit)
 
-		resultTaxSelfEmployment.textContent = formatCurrency(tax)
-		resultTaxCompensation.textContent = formatCurrency(benifit - finalBenifit)
-		resultTaxRestCompensation.textContent = formatCurrency(finalBenifit)
-		resultTaxResult.textContent = formatCurrency(finalTax)
-	})
+			resultTaxSelfEmployment.textContent = formatCurrency(tax)
+			resultTaxCompensation.textContent = formatCurrency(benifit - finalBenifit)
+			resultTaxRestCompensation.textContent = formatCurrency(finalBenifit)
+			resultTaxResult.textContent = formatCurrency(finalTax)
+		}, 500)
+	)
 }
 
 {
@@ -130,26 +157,29 @@ function formatCurrency(n) {
 
 	checkFormBusiness()
 
-	formOsno.addEventListener('input', () => {
-		checkFormBusiness()
+	formOsno.addEventListener(
+		'input',
+		debounce(() => {
+			checkFormBusiness()
 
-		const income = +formOsno.income.value
-		const expenses = +formOsno.expenses.value
-		const property = +formOsno.property.value
+			const income = +formOsno.income.value
+			const expenses = +formOsno.expenses.value
+			const property = +formOsno.property.value
 
-		const nds = income * 0.2
-		const taxProperty = property * 0.02
-		const profit = income < expenses ? 0 : income - expenses
-		const ndflExpensesTotal = profit * 0.13
-		const ndflIncomeTotal = (income - nds) * 0.13
-		const taxProfit = profit * 0.2
+			const nds = income * 0.2
+			const taxProperty = property * 0.02
+			const profit = income < expenses ? 0 : income - expenses
+			const ndflExpensesTotal = profit * 0.13
+			const ndflIncomeTotal = (income - nds) * 0.13
+			const taxProfit = profit * 0.2
 
-		resultTaxNds.textContent = formatCurrency(nds)
-		resultTaxProperty.textContent = formatCurrency(taxProperty)
-		resultTaxNdflExpenses.textContent = formatCurrency(ndflExpensesTotal)
-		resultTaxNdflIncome.textContent = formatCurrency(ndflIncomeTotal)
-		resultTaxProfit.textContent = formatCurrency(taxProfit)
-	})
+			resultTaxNds.textContent = formatCurrency(nds)
+			resultTaxProperty.textContent = formatCurrency(taxProperty)
+			resultTaxNdflExpenses.textContent = formatCurrency(ndflExpensesTotal)
+			resultTaxNdflIncome.textContent = formatCurrency(ndflIncomeTotal)
+			resultTaxProfit.textContent = formatCurrency(taxProfit)
+		}, 500)
+	)
 }
 
 {
@@ -198,28 +228,31 @@ function formatCurrency(n) {
 
 	typeTax[formUsn.typeTax.value]()
 
-	formUsn.addEventListener('input', () => {
-		typeTax[formUsn.typeTax.value]()
+	formUsn.addEventListener(
+		'input',
+		debounce(() => {
+			typeTax[formUsn.typeTax.value]()
 
-		const income = +formUsn.income.value
-		const expenses = +formUsn.expenses.value
-		const contributions = +formUsn.contributions.value
-		const property = +formUsn.property.value
+			const income = +formUsn.income.value
+			const expenses = +formUsn.expenses.value
+			const contributions = +formUsn.contributions.value
+			const property = +formUsn.property.value
 
-		let profit = income - contributions
+			let profit = income - contributions
 
-		if (formUsn.typeTax.value !== 'income') {
-			profit -= expenses
-		}
+			if (formUsn.typeTax.value !== 'income') {
+				profit -= expenses
+			}
 
-		const taxBigIncome = income > LIMIT ? (profit - LIMIT) * 0.01 : 0
-		const summ = profit - (taxBigIncome < 0 ? 0 : taxBigIncome)
-		const tax = summ * percent[formUsn.typeTax.value]
-		const taxProperty = property * 0.02
+			const taxBigIncome = income > LIMIT ? (profit - LIMIT) * 0.01 : 0
+			const summ = profit - (taxBigIncome < 0 ? 0 : taxBigIncome)
+			const tax = summ * percent[formUsn.typeTax.value]
+			const taxProperty = property * 0.02
 
-		resultTaxTotal.textContent = formatCurrency(tax < 0 ? 0 : tax)
-		resultTaxProperty.textContent = formatCurrency(taxProperty)
-	})
+			resultTaxTotal.textContent = formatCurrency(tax < 0 ? 0 : tax)
+			resultTaxProperty.textContent = formatCurrency(taxProperty)
+		}, 500)
+	)
 }
 
 {
@@ -232,17 +265,20 @@ function formatCurrency(n) {
 	const resultTaxPossible = taxReturn.querySelector('.result__tax_possible')
 	const resultTaxDeduction = taxReturn.querySelector('.result__tax_deduction')
 
-	formTaxReturn.addEventListener('input', () => {
-		const expenses = +formTaxReturn.expenses.value
-		const income = +formTaxReturn.income.value
-    const sumExpenses = +formTaxReturn.sumExpenses.value
+	formTaxReturn.addEventListener(
+		'input',
+		debounce(() => {
+			const expenses = +formTaxReturn.expenses.value
+			const income = +formTaxReturn.income.value
+			const sumExpenses = +formTaxReturn.sumExpenses.value
 
-		const ndfl = income * 0.13
-		const possibleDeduction = expenses < sumExpenses ? expenses * 0.13 : sumExpenses * 0.13
-    const deduction = possibleDeduction < ndfl ? possibleDeduction : ndfl
+			const ndfl = income * 0.13
+			const possibleDeduction = expenses < sumExpenses ? expenses * 0.13 : sumExpenses * 0.13
+			const deduction = possibleDeduction < ndfl ? possibleDeduction : ndfl
 
-    resultTaxNdfl.textContent = formatCurrency(ndfl)
-		resultTaxPossible.textContent = formatCurrency(possibleDeduction)
-		resultTaxDeduction.textContent = formatCurrency(deduction)
-	})
+			resultTaxNdfl.textContent = formatCurrency(ndfl)
+			resultTaxPossible.textContent = formatCurrency(possibleDeduction)
+			resultTaxDeduction.textContent = formatCurrency(deduction)
+		}, 500)
+	)
 }

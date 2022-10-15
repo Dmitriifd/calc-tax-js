@@ -35,14 +35,18 @@ function formatCurrency(n) {
 	// АУСН
 
 	formAusn.addEventListener('input', () => {
+		const income = +formAusn.income.value
+
 		if (formAusn.type.value === 'income') {
 			calcLabelExpenses.style.display = 'none'
-			resultTaxTotal.textContent = formatCurrency(formAusn.income.value * 0.08)
+			resultTaxTotal.textContent = formatCurrency(income * 0.08)
 			formAusn.expenses.value = ''
 		}
 		if (formAusn.type.value === 'expenses') {
+			const expenses = +formAusn.expenses.value
+			const profit = income < expenses ? 0 : income - expenses
 			calcLabelExpenses.style.display = ''
-			resultTaxTotal.textContent = formatCurrency((formAusn.income.value - formAusn.expenses.value) * 0.2)
+			resultTaxTotal.textContent = formatCurrency(profit * 0.2)
 		}
 	})
 }
@@ -73,15 +77,18 @@ function formatCurrency(n) {
 	calcCompensation.style.display = 'none'
 
 	formSelfEmployment.addEventListener('input', () => {
-		const resultIndividual = formSelfEmployment.individual.value * 0.04
-		const resultEntity = formSelfEmployment.entity.value * 0.06
+		const individual = +formSelfEmployment.individual.value
+		const entity = +formSelfEmployment.entity.value
+		const resultIndividual = individual * 0.04
+		const resultEntity = entity * 0.06
 
 		checkCompensation()
 
 		const tax = resultIndividual + resultEntity
-		formSelfEmployment.compensation.value = formSelfEmployment.compensation.value > 10_000 ? 10_000 : formSelfEmployment.compensation.value
-		const benifit = formSelfEmployment.compensation.value
-		const resBenifit = formSelfEmployment.individual.value * 0.01 + formSelfEmployment.entity.value * 0.02
+
+		formSelfEmployment.compensation.value = +formSelfEmployment.compensation.value > 10_000 ? 10_000 : formSelfEmployment.compensation.value
+		const benifit = +formSelfEmployment.compensation.value
+		const resBenifit = individual * 0.01 + entity * 0.02
 		const finalBenifit = benifit - resBenifit > 0 ? benifit - resBenifit : 0
 		const finalTax = tax - (benifit - finalBenifit)
 
@@ -126,13 +133,13 @@ function formatCurrency(n) {
 	formOsno.addEventListener('input', () => {
 		checkFormBusiness()
 
-		const income = formOsno.income.value
-		const expenses = formOsno.expenses.value
-		const property = formOsno.property.value
+		const income = +formOsno.income.value
+		const expenses = +formOsno.expenses.value
+		const property = +formOsno.property.value
 
 		const nds = income * 0.2
 		const taxProperty = property * 0.02
-		const profit = income - expenses
+		const profit = income < expenses ? 0 : income - expenses
 		const ndflExpensesTotal = profit * 0.13
 		const ndflIncomeTotal = (income - nds) * 0.13
 		const taxProfit = profit * 0.2
@@ -148,7 +155,7 @@ function formatCurrency(n) {
 {
 	// УСН
 
-  const LIMIT = 300_000
+	const LIMIT = 300_000
 
 	const usn = document.querySelector('.usn')
 	const formUsn = usn.querySelector('.calc__form')
@@ -183,34 +190,34 @@ function formatCurrency(n) {
 		},
 	}
 
-  const percent = {
-    income:  0.06,
-    'ip-expenses': 0.15,
-    'ooo-expenses':  0.15,
-  }
+	const percent = {
+		income: 0.06,
+		'ip-expenses': 0.15,
+		'ooo-expenses': 0.15,
+	}
 
 	typeTax[formUsn.typeTax.value]()
 
 	formUsn.addEventListener('input', () => {
 		typeTax[formUsn.typeTax.value]()
 
-		const income = formUsn.income.value
-		const expenses = formUsn.expenses.value
-		const contributions = formUsn.contributions.value
-		const property = formUsn.property.value
+		const income = +formUsn.income.value
+		const expenses = +formUsn.expenses.value
+		const contributions = +formUsn.contributions.value
+		const property = +formUsn.property.value
 
-    let profit = income - contributions
+		let profit = income - contributions
 
-    if (formUsn.typeTax.value !== 'income') {
-      profit -= expenses
-    }
+		if (formUsn.typeTax.value !== 'income') {
+			profit -= expenses
+		}
 
-    const taxBigIncome = income > LIMIT ? (profit - LIMIT) * 0.01 : 0
-    const summ = profit - (taxBigIncome < 0 ? 0 : taxBigIncome)
-    const tax = summ * percent[formUsn.typeTax.value]
-    const taxProperty = property * 0.02
+		const taxBigIncome = income > LIMIT ? (profit - LIMIT) * 0.01 : 0
+		const summ = profit - (taxBigIncome < 0 ? 0 : taxBigIncome)
+		const tax = summ * percent[formUsn.typeTax.value]
+		const taxProperty = property * 0.02
 
-    resultTaxTotal.textContent = formatCurrency(tax)
+		resultTaxTotal.textContent = formatCurrency(tax < 0 ? 0 : tax)
 		resultTaxProperty.textContent = formatCurrency(taxProperty)
 	})
 }

@@ -221,3 +221,28 @@ function formatCurrency(n) {
 		resultTaxProperty.textContent = formatCurrency(taxProperty)
 	})
 }
+
+{
+	// Налоговый вычет
+
+	const taxReturn = document.querySelector('.tax-return')
+	const formTaxReturn = taxReturn.querySelector('.calc__form')
+
+	const resultTaxNdfl = taxReturn.querySelector('.result__tax_ndfl')
+	const resultTaxPossible = taxReturn.querySelector('.result__tax_possible')
+	const resultTaxDeduction = taxReturn.querySelector('.result__tax_deduction')
+
+	formTaxReturn.addEventListener('input', () => {
+		const expenses = +formTaxReturn.expenses.value
+		const income = +formTaxReturn.income.value
+    const sumExpenses = +formTaxReturn.sumExpenses.value
+
+		const ndfl = income * 0.13
+		const possibleDeduction = expenses < sumExpenses ? expenses * 0.13 : sumExpenses * 0.13
+    const deduction = possibleDeduction < ndfl ? possibleDeduction : ndfl
+
+    resultTaxNdfl.textContent = formatCurrency(ndfl)
+		resultTaxPossible.textContent = formatCurrency(possibleDeduction)
+		resultTaxDeduction.textContent = formatCurrency(deduction)
+	})
+}
